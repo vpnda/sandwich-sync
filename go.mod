@@ -13,7 +13,7 @@ require (
 	github.com/samber/lo v1.50.0
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
-	github.com/vpnda/scotiafetch v0.0.0-20250521233659-b5b1c468493c
+	github.com/vpnda/scotiafetch v0.0.0-20250801182250-05046ca13d4f
 	github.com/vpnda/wsfetch v0.1.2-0.20250515155945-15d5c1997864
 	golang.org/x/text v0.25.0
 )

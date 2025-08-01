@@ -3,17 +3,23 @@ import json
 from patchright.sync_api import sync_playwright, Page, Cookie
 from urllib.parse import urlencode, urlparse, parse_qs, unquote
 from uuid import uuid4
-from typing import Dict, List, cast
+from typing import Dict, List, cast, Tuple
 import yaml
 import time
 import os
 import sys
 from logging import getLogger, INFO, StreamHandler
+from random import randint
 
 logger = getLogger()
 logger.setLevel(INFO)
 logger.addHandler(StreamHandler(sys.stdout))
 info = logger.info
+
+
+launch_options = {
+    "headless": False,
+}
 
 @dataclass
 class AuthSession:
@@ -21,6 +27,11 @@ class AuthSession:
     Cookie that is saved to avoid 2FA again (bns-auth-saved-users)
     """
     multi_user_cookie: Cookie 
+
+    """
+    2sv cookie
+    """
+    two_sv_cookie: Cookie
 
     """
     RSID that was used to authenticate the session
@@ -106,7 +117,8 @@ class ScotiaClient:
                 auth_session=AuthSession(
                     multi_user_cookie=session_data["auth_session"]["multi_user_cookie"],
                     used_rsid=session_data["auth_session"]["used_rsid"],
-                    auth_token=session_data["auth_session"]["auth_token"]
+                    auth_token=session_data["auth_session"]["auth_token"],
+                    two_sv_cookie=session_data["auth_session"]["two_sv_cookie"]
                 ),
                 client_session=ClientSession(
                     session_id_cookie=session_data["client_session"]["session_id_cookie"],
@@ -188,8 +200,8 @@ class ScotiaClient:
             "Content-Type": "application/json",
             "x-client-id": self.clientId,
         }
-    
-    def fetch_auth_saved_users(self, page: Page) -> Cookie:
+
+    def fetch_auth_saved_users(self, page: Page) -> Tuple[Cookie, Cookie]:
         """
         Fetch the auth saved users from the response
         """
@@ -240,11 +252,18 @@ class ScotiaClient:
             (cookie for cookie in second_round_cookies if "name" in cookie and "bns-auth-saved-users" in cookie["name"]),
             None
         )
+        two_sv_cookie = next(
+            (cookie for cookie in second_round_cookies if "name" in cookie and "2sv" in cookie["name"]),
+            None
+        )
         if not bns_auth_saved_user_cookie:
             raise Exception("Missing set-cookie in current context, cookies: " + str(page.context.cookies()))
         
+        if not two_sv_cookie:
+            raise Exception("Missing 2sv cookie in current context, cookies: " + str(page.context.cookies()))
+
         info("Multi-user API responded with valid cookie")
-        return bns_auth_saved_user_cookie
+        return bns_auth_saved_user_cookie, two_sv_cookie
 
     def save_session(self):
         """
@@ -311,7 +330,7 @@ class ScotiaClient:
 
     def authenticate(self):
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False)
+            browser = p.chromium.launch(**launch_options)
             page = browser.new_page()
 
             self.populate_cookies_from_session(page)
@@ -436,7 +455,7 @@ class ScotiaClient:
             if not auth_token:
                 raise Exception("Missing auth token in response")
             info("--------- STEP 4 ---------")
-            bns_auth_saved_users: Cookie = self.fetch_auth_saved_users(page)
+            bns_auth_saved_users, two_sv_cookie = self.fetch_auth_saved_users(page)
 
             redirect_uri = auth_with_code["redirect_uri"]
             parsed_uri = urlparse(redirect_uri)
@@ -456,7 +475,8 @@ class ScotiaClient:
                 auth_session=AuthSession(
                     multi_user_cookie=bns_auth_saved_users,
                     used_rsid=self.rsid,
-                    auth_token=auth_token
+                    auth_token=auth_token,
+                    two_sv_cookie=two_sv_cookie
                 ),
                 client_session=self.collect_session_client_cookies(page)
             )

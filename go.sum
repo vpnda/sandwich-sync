@@ -69,6 +69,12 @@ github.com/vpnda/scotiafetch v0.0.0-20250521232439-1813849e5654 h1:mst/If+YM/RIm
 github.com/vpnda/scotiafetch v0.0.0-20250521232439-1813849e5654/go.mod h1:frbYBDTj15ltYVvm+CI7lJnPXJBPr0cqH8ayBvHU0Sg=
 github.com/vpnda/scotiafetch v0.0.0-20250521233659-b5b1c468493c h1:4iEZjfNt9c6i74wxEh0Ty7g/zXA6skmf+t/PWzScL70=
 github.com/vpnda/scotiafetch v0.0.0-20250521233659-b5b1c468493c/go.mod h1:frbYBDTj15ltYVvm+CI7lJnPXJBPr0cqH8ayBvHU0Sg=
+github.com/vpnda/scotiafetch v0.0.0-20250801181142-86bda0609551 h1:ywrAIBMKveu8ZMvlTQW6Cgw1wv5MSzU3zqrhU/HfIQc=
+github.com/vpnda/scotiafetch v0.0.0-20250801181142-86bda0609551/go.mod h1:frbYBDTj15ltYVvm+CI7lJnPXJBPr0cqH8ayBvHU0Sg=
+github.com/vpnda/scotiafetch v0.0.0-20250801181939-b42391420844 h1:twn0n4ELUp74nvANaFVyWrQWq9SyiOUPVGC0R5Ql9a0=
+github.com/vpnda/scotiafetch v0.0.0-20250801181939-b42391420844/go.mod h1:frbYBDTj15ltYVvm+CI7lJnPXJBPr0cqH8ayBvHU0Sg=
+github.com/vpnda/scotiafetch v0.0.0-20250801182250-05046ca13d4f h1:NSN58AB41/vGSspc7dm3TOGROTtM7cQ4fGhSJloMrYo=
+github.com/vpnda/scotiafetch v0.0.0-20250801182250-05046ca13d4f/go.mod h1:frbYBDTj15ltYVvm+CI7lJnPXJBPr0cqH8ayBvHU0Sg=
 github.com/vpnda/wsfetch v0.1.2-0.20250515155945-15d5c1997864 h1:aNJv4LJVJJ++Reyrd4q2y3Qt+Z2vmyHeh723fyIvVow=
 github.com/vpnda/wsfetch v0.1.2-0.20250515155945-15d5c1997864/go.mod h1:gzD+GEHzvlbCYBugSHqwL7HZn0TqsxlFIitaXtlNBSc=
 go.uber.org/goleak v1.3.0 h1:2K3zAYmnTNqV73imy9J1T3WC+gmCePx2hEGkimedGto=
