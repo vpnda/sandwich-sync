@@ -95,6 +95,11 @@ func (w *WealthsimpleClient) getActivityForAccount(ctx context.Context, account 
 			return nil, fmt.Errorf("failed to get transaction description: %w", err)
 		}
 
+		if trn.Currency == nil || trn.CanonicalId == nil {
+			log.Warn().Msgf("Skipping transaction with missing currency or canonical ID: %v", desc)
+			continue
+		}
+
 		transactions = append(transactions, models.TransactionWithAccount{
 			Transaction: models.Transaction{
 				ReferenceNumber: *trn.CanonicalId,

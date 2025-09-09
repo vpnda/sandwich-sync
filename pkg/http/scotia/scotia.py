@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import json
-from patchright.sync_api import sync_playwright, Page, Cookie
+from patchright.sync_api import Page, Cookie
+from camoufox.sync_api import Camoufox
 from urllib.parse import urlencode, urlparse, parse_qs, unquote
 from uuid import uuid4
 from typing import Dict, List, cast, Tuple
@@ -277,7 +278,8 @@ class ScotiaClient:
                 "auth_session": {
                     "multi_user_cookie": self.session.auth_session.multi_user_cookie,
                     "used_rsid": self.session.auth_session.used_rsid,
-                    "auth_token": self.session.auth_session.auth_token
+                    "auth_token": self.session.auth_session.auth_token,
+                    "two_sv_cookie": self.session.auth_session.two_sv_cookie
                 },
                 "client_session": {
                     "session_id_cookie": self.session.client_session.session_id_cookie,
@@ -315,8 +317,9 @@ class ScotiaClient:
         
         # Check if the bypass_akamai cookies are present
         bypass_akamai_cookies = [
-            cookie for cookie in page_cookies if "name" in cookie and cookie["name"] in ["bm_sv", "bm_sz", "_abck", 
-                                                                    "ak_bmsc", "AKA_A2", "bm_mi", "bmuid"]
+            cookie for cookie in page_cookies if "name" in cookie and cookie["name"] in [
+                "bm_sv", "bm_sz", "_abck", "ak_bmsc", "AKA_A2", "bm_mi", "bmuid"
+            ]
         ]
         if not bypass_akamai_cookies:
             raise Exception("Missing bypass_akamai cookies in current context, cookies: " + str(page_cookies))
@@ -329,8 +332,8 @@ class ScotiaClient:
         )
 
     def authenticate(self):
-        with sync_playwright() as p:
-            browser = p.chromium.launch(**launch_options)
+        with Camoufox(os="windows") as browser:
+            # browser = p.chromium.launch(**launch_options)
             page = browser.new_page()
 
             self.populate_cookies_from_session(page)

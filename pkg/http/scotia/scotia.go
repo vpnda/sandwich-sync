@@ -9,6 +9,7 @@ import (
 	"net/http/cookiejar"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"github.com/samber/lo"
 	iface "github.com/vpnda/sandwich-sync/pkg/http"
 	"github.com/vpnda/sandwich-sync/pkg/models"
@@ -112,7 +113,12 @@ func (s *ScotiaClient) FetchTransactions(ctx context.Context) ([]models.Transact
 		for _, transaction := range transactions.GetData().Settled {
 			date, err := time.Parse("2006-01-02T15:04:05", *transaction.TransactionDate)
 			if err != nil {
-				return nil, fmt.Errorf("failed to parse transaction date %s: %w", *transaction.TransactionDate, err)
+				log.Ctx(ctx).Warn().Err(err).Msgf("failed to parse transaction date %s, trying non expansive format", *transaction.TransactionDate)
+
+				date, err = time.Parse("2006-01-02", *transaction.TransactionDate)
+				if err != nil {
+					return nil, fmt.Errorf("failed to parse transaction date %s: %w", *transaction.TransactionDate, err)
+				}
 			}
 			transactionWithAccount := models.TransactionWithAccount{
 				SourceAccountName: AccountName(&account),
